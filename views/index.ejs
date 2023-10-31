@@ -1,0 +1,107 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .expand-collapse {
+        cursor: pointer;
+      }
+      .expand-collapse-under {
+        cursor: pointer;
+      }
+      td {
+        border: 1px solid #000;
+      }
+      .expand-collapse {
+          background-color: transparent;
+          border: none;
+          font-size: 16px;
+          cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <% 
+    let currentGroup1 = "";
+    let currentGroup2 = "";
+    %>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Hesap Kodu</th>
+          <th>Toplam Borç</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <% liste.forEach(item => { %>
+          <% const parts = item.hesap_kodu.split('.'); %>
+      
+
+          <% if (parts.length >= 1 && parts[0] !== currentGroup1) { %>
+              <tr class="group-row" data-toggle-group1="<%= parts[0] %>">
+                  <td><button class="expand-collapse" onclick="toggleGroup1('<%= parts[0] %>')">+</button></td>
+                  <td><%= parts[0] %></td>
+                  <td><%= item.borc %></td>
+              </tr>
+              <% currentGroup1 = parts[0]; %>
+              <% currentGroup2 = ""; %>
+          <% } %>
+      
+          <% if (parts.length >= 2) { %>
+              <% const secondaryGroup = parts.slice(0, 2).join('.'); %>
+              <% if (secondaryGroup !== currentGroup2) { %>
+                  <tr class="child-row" data-parent-group1="<%= currentGroup1 %>" data-toggle-group2="<%= secondaryGroup %>" style="display:none;">
+                      <td><button class="expand-collapse" onclick="toggleGroup2('<%= secondaryGroup %>')">+</button></td>
+                      <td><%= secondaryGroup %></td>
+                      <td><%= item.borc %></td>
+                  </tr>
+                  <% currentGroup2 = secondaryGroup; %>
+              <% } %>
+          <% } %>
+      
+      
+          <% if (parts.length >= 3 && item.hesap_kodu.startsWith(currentGroup2)) { %>
+              <tr class="last-data" data-parent-group2="<%= currentGroup2 %>" style="display:none;">
+                  <td></td>
+                  <td><%= item.hesap_kodu %></td>
+                  <td><%= item.borc %></td>
+              </tr>
+          <% } %>
+      <% }); %>
+
+        
+
+      </tbody>
+    </table>
+    <script>
+      function toggleGroup1(group) {
+    const rows = document.querySelectorAll(`[data-parent-group1="${group}"]`);
+    
+    rows.forEach(row => {
+        if (row.style.display === "none") {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+         }
+    });
+}
+
+function toggleGroup2(group) {
+    const rows = document.querySelectorAll(`[data-parent-group2="${group}"]`);
+    rows.forEach(row => {
+        if (row.style.display === "none") {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+    </script>
+  </body>
+</html>
